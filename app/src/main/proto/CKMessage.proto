@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option java_package = "com.example.compose_kotlin";
+option java_multiple_files = true;
+
+message ProtoCKMessageStore {
+	repeated ProtoCKMessage messages = 1;
+}
+
+message ProtoCKMessage {
+	string message = 1;
+	uint64 messageID = 2;
+}
