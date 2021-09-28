@@ -12,12 +12,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.example.compose_kotlin.logic.MessageEvent
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.shadow
+import kotlin.reflect.KProperty
 
 
 @Composable
 fun MainScreen(eventHandler: (MessageEvent) -> Unit, viewModel: MessageViewModel) {
     // A surface container using the 'background' color from the theme
-    Surface(color = MaterialTheme.colors.background) {
+    Surface(
+        color = MaterialTheme.colors.background,
+        modifier = Modifier.padding(12.dp)
+    ) {
         MainContent(eventHandler, viewModel)
     }
 }
@@ -48,18 +54,22 @@ fun MessageColumn(
         messageDisplay = it
     }
 
-    Column() {
+    Column(
+    ) {
         messageDisplay.forEach {
             MessageBox(it)
+            Divider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 14.dp)
+            )
         }
     }
 }
 
 @Composable
 fun MessageBox(message: MessageView) {
-    Box(
-
-    ) {
+    Box {
         Text(message.text)
     }
 }
@@ -68,22 +78,22 @@ fun MessageBox(message: MessageView) {
 @Composable
 fun EntryBox(eventHandler: (MessageEvent) -> Unit) {
     val entryText = remember { mutableStateOf(TextFieldValue()) }
-    Column {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
         TextField(
             value = entryText.value,
             onValueChange = { entryText.value = it },
             placeholder = { Text("enter message") },
-            modifier = Modifier
-                .background(Color.Red)
+            modifier = Modifier.fillMaxWidth()
         )
+        Spacer(Modifier.size(10.dp))
         Button(
             onClick = {
                 eventHandler.invoke(MessageEvent.OnNewMessage(entryText.value.text))
+                entryText.value = TextFieldValue("")
                       },
-            modifier = Modifier.size(25.dp),
-            colors = ButtonDefaults.textButtonColors(
-                backgroundColor = Color.Blue
-            )
+            modifier = Modifier.then(Modifier.shadow(elevation = 6.dp))
         ) {
             Text("Add Text")
         }
