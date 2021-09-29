@@ -1,8 +1,13 @@
 package com.example.compose_kotlin.ui
 
+import android.widget.Space
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
@@ -14,6 +19,9 @@ import androidx.compose.ui.unit.dp
 import com.example.compose_kotlin.logic.MessageEvent
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.res.painterResource
+import com.example.compose_kotlin.R
+import java.util.function.IntConsumer
 import kotlin.reflect.KProperty
 
 
@@ -37,14 +45,15 @@ fun MainContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         MessageColumn(eventHandler, viewModel)
+        Spacer(modifier = Modifier.size(10.dp))
         EntryBox(eventHandler)
     }
 }
 
 @Composable
-fun MessageColumn(
+fun ColumnScope.MessageColumn(
     eventHandler: (MessageEvent) -> Unit,
-    viewModel: MessageViewModel
+    viewModel: MessageViewModel,
 ) {
     var messageDisplay by remember {
         mutableStateOf(viewModel.messageDisplay, neverEqualPolicy())
@@ -55,9 +64,12 @@ fun MessageColumn(
     }
 
     Column(
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            .weight(1f),
     ) {
         messageDisplay.forEach {
-            MessageBox(it)
+            MessageBox(eventHandler, it)
             Divider(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -68,9 +80,29 @@ fun MessageColumn(
 }
 
 @Composable
-fun MessageBox(message: MessageView) {
-    Box {
-        Text(message.text)
+fun MessageBox(eventHandler: (MessageEvent) -> Unit, message: MessageView) {
+    Row(
+        Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 4.dp),
+            text = message.text
+        )
+        IconButton(
+            onClick = {
+                    eventHandler.invoke(MessageEvent.OnDeleteMessage(message.id))
+                },
+            ) {
+            Icon(
+                modifier = Modifier.size(20.dp),
+                tint = Color.Red,
+                painter = painterResource(id = R.drawable.ic_close),
+                contentDescription = "close"
+            )
+        }
     }
 }
 

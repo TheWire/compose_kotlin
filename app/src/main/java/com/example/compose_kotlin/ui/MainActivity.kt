@@ -36,7 +36,9 @@ class MainActivity : ComponentActivity(), ICKContainer {
         finish()
     }
 
-    override fun displayError(errorText: String) = error(errorText)
+    override fun displayError(errorText: String) {
+        error(errorText)
+    }
 }
 
 

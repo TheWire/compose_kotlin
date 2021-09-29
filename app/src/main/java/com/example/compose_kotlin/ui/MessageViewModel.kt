@@ -19,7 +19,7 @@ class MessageViewModel(){
     fun updateMessageDisplay(event: ViewModelEvent) {
         when(event) {
             is ViewModelEvent.AddMessage -> addMessage(event.messageView)
-            is ViewModelEvent.DeleteMessage -> deleteMessage(event.messageView)
+            is ViewModelEvent.DeleteMessage -> deleteMessage(event.id)
             is ViewModelEvent.InitMessage -> initScreen(event.messageList)
         }
         subMessageDisplay?.invoke(messageDisplay)
@@ -29,8 +29,8 @@ class MessageViewModel(){
         messageDisplay.add(messageView)
     }
 
-    private fun deleteMessage(messageView: MessageView) {
-        messageDisplay.remove(messageView)
+    private fun deleteMessage(id: Long) {
+        messageDisplay.removeIf { it.id == id }
     }
 
 
@@ -43,6 +43,6 @@ class MessageView(
 
 sealed class ViewModelEvent {
     data class AddMessage(val messageView: MessageView): ViewModelEvent()
-    data class DeleteMessage(val messageView: MessageView): ViewModelEvent()
+    data class DeleteMessage(val id: Long): ViewModelEvent()
     data class InitMessage(val messageList: CKMessageList): ViewModelEvent()
 }

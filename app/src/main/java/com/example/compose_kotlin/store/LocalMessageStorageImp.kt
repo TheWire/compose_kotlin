@@ -39,19 +39,28 @@ class LocalMessageStorageImp(
             }
     }
 
-    override suspend fun deleteMessage(message: CKMessage): MessageStorageResult =
+    override suspend fun deleteMessage(id: Long): MessageStorageResult =
         withContext(Dispatchers.IO) {
             try {
                 dataStore.updateData { messages ->
-
-                    messages.toBuilder().removeMessages(
-                        messages.messagesList.indexOf(message.ProtoCKMessage())
-                    ).build()
+                    val ret = findMessageById(messages.messagesList, id) {
+                        messages.toBuilder().removeMessages(it)
+                    } as ProtoCKMessageStore.Builder? ?: throw Exception("message does not exist")
+                    ret.build()
                 }
                 MessageStorageResult.OnComplete
             } catch (e: Exception) {
                 MessageStorageResult.OnError(e)
             }
+    }
+
+    private fun findMessageById(messages: List<ProtoCKMessage>, id: Long, cb: (Int) -> Any?): Any? {
+        for ((index, protoCKMessage) in messages.withIndex()) {
+            if(protoCKMessage.messageID == id) {
+                return cb(index)
+            }
+        }
+        return null
     }
 }
 

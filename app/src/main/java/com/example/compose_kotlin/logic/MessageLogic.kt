@@ -1,5 +1,6 @@
 package com.example.compose_kotlin.logic
 
+import android.util.Log
 import com.example.compose_kotlin.domain.CKMessage
 import com.example.compose_kotlin.store.IMessageStorage
 import com.example.compose_kotlin.store.MessageStorageResult
@@ -42,11 +43,16 @@ class MessageLogic(
         }
     }
 
-    private fun onDeleteMessage(id: Long) {
-        TODO("Not yet implemented")
-//        viewModel.updateMessageDisplay(
-////            ViewModelEvent.DeleteMessage()
-//        )
+    private fun onDeleteMessage(id: Long) = launch {
+
+        when (val result = storage.deleteMessage(id)) {
+            is MessageStorageResult.OnComplete -> viewModel.updateMessageDisplay(
+                ViewModelEvent.DeleteMessage(id)
+            )
+            is MessageStorageResult.OnError -> container.displayError(
+                "error deleting message from storage"
+            )
+        }
     }
 
     private fun onStop() {
